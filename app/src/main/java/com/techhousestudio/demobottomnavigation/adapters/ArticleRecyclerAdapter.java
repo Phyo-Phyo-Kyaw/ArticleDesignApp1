@@ -1,7 +1,9 @@
 package com.techhousestudio.demobottomnavigation.adapters;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
+import android.provider.ContactsContract;
 import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,7 +17,8 @@ import androidx.core.text.HtmlCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.techhousestudio.demobottomnavigation.R;
-import com.techhousestudio.demobottomnavigation.models.Article;
+import com.techhousestudio.demobottomnavigation.database.Article;
+import com.techhousestudio.demobottomnavigation.ui.InsertArticlesActivity;
 
 import java.util.List;
 
@@ -24,10 +27,19 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<ArticleRecycler
     private List<Article> articles;
     private int[] colors = {Color.RED, Color.GREEN, Color.BLACK, Color.GRAY, Color.CYAN};
 
-    public ArticleRecyclerAdapter(Context context, List<Article> articles) {
-        this.articles = articles;
+    public ArticleRecyclerAdapter(Context context) {
+        //this.articles = articles;
         this.context = context;
         Log.d("WKKN", "Call Recycler View");
+    }
+
+    public void setArticles(List<Article> articles) {
+        this.articles = articles;
+        notifyDataSetChanged();
+    }
+
+    public List<Article> getArticles() {
+        return articles;
     }
 
     @NonNull
@@ -39,7 +51,7 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<ArticleRecycler
 
     @Override
     public void onBindViewHolder(@NonNull final ArticleRecyclerAdapter.ArticleViewHolder holder, int position) {
-        Article article = articles.get(position);
+        final Article article = articles.get(position);
         holder.tvTitle.setText(article.title);
         holder.tvContent.setText(article.content);
         holder.btnLike.setText(article.likeCount > 1 ? article.likeCount + " Likes" : article.likeCount + " Like");
@@ -54,6 +66,19 @@ public class ArticleRecyclerAdapter extends RecyclerView.Adapter<ArticleRecycler
                 holder.btnLike.setText(random > 1 ? random + " Likes" : random + " Like");
             }
         });
+
+        holder.tvContent.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(context, InsertArticlesActivity.class);
+                intent.putExtra("BtnName","UPDATE");
+                intent.putExtra("id",article.uid);
+                intent.putExtra("title",holder.tvTitle.getText());
+                intent.putExtra("content",holder.tvContent.getText());
+                context.startActivity(intent);
+            }
+        });
+
     }
 
     @Override
